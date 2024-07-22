@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <style>
+        .message { margin-bottom: 10px; }
+        .self { text-align: right; }
+    </style>
+</head>
+<body>
+    <div id="chat-window"></div>
+    <input id="username" placeholder="Username">
+    <input id="message" placeholder="Message">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        const socket = io();
+
+        // 이전 채팅 메시지 로드
+        fetch('/get_chats')
+            .then(response => response.json())
+            .then(data => {
+                const chatWindow = document.getElementById('chat-window');
+                data.forEach(chat => {
+                    displayMessage(chat);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching chats:', error);
+            });
+
+        // 새로운 메시지 수신
+        socket.on('message', data => {
+            displayMessage(data);
+        });
+
+        // 메시지 전송
+        function sendMessage() {
+            const username = document.getElementById('username').value;
+            const message = document.getElementById('message').value;
+            socket.emit('message', { username, msg: message });
+            document.getElementById('message').value = '';
+        }
+
+        // 채팅 창에 메시지 표시
+        function displayMessage(chat) {
+            const chatWindow = document.getElementById('chat-window');
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message';
+            if (chat.username === document.getElementById('username').value) {
+                messageElement.classList.add('self');
+            }
+            messageElement.textContent = `${chat.username}: ${chat.msg} (${chat.timestamp})`;
+            chatWindow.appendChild(messageElement);
+            chatWindow.scrollTop = chatWindow.scrollHeight; // 스크롤 맨 아래로 이동
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!-- index2.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat History Search</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Search Chat History</h1>
+    <form id="searchForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username">
+        <button type="submit">Search</button>
+    </form>
+    <div id="chatHistory">
+        <!-- 채팅 내용이 여기에 동적으로 추가될 예정 -->
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#searchForm').submit(function(event) {
+                event.preventDefault();
+                var username = $('#username').val().trim();
+                fetchUserChats(username);
+            });
+
+            function fetchUserChats(username) {
+                $.ajax({
+                    url: '/get_user_chats/' + username,
+                    type: 'GET',
+                    success: function(response) {
+                        displayChats(response);
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            }
+
+            function displayChats(chats) {
+                $('#chatHistory').empty();
+                chats.forEach(function(chat) {
+                    var message = '<p><strong>' + chat.username + '</strong>: ' + chat.msg + ' (' + chat.timestamp + ')</p>';
+                    $('#chatHistory').append(message);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
