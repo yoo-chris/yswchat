@@ -1,10 +1,16 @@
-<!-- index2.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Chat History Search</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        .chat-message {
+            border-bottom: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 5px;
+        }
+    </style>
 </head>
 <body>
     <h1>Search Chat History</h1>
@@ -41,7 +47,12 @@
             function displayChats(chats) {
                 $('#chatHistory').empty();
                 chats.forEach(function(chat) {
-                    var message = '<p><strong>' + chat.username + '</strong>: ' + chat.msg + ' (' + chat.timestamp + ')</p>';
+                    var offensiveClass = chat.is_offensive ? 'offensive' : 'clean';
+                    var message = '<div class="chat-message ' + offensiveClass + '">';
+                    message += '<p><strong>' + chat.username + '</strong>: ' + chat.msg + ' (' + chat.timestamp + ')</p>';
+                    message += '<p>Label: ' + chat.is_offensive + '</p>';
+                    message += '<p>Score: ' + chat.offensive_score.toFixed(2) + '%</p>';
+                    message += '</div>';
                     $('#chatHistory').append(message);
                 });
             }
